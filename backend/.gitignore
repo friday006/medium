@@ -13,12 +13,13 @@ dist/
 
 # deps
 node_modules/
-wrangler
+.wrangler
 
 # env
 .env
 .env.production
 .dev.vars
+wrangler.toml
 
 # logs
 logs/
