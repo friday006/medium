@@ -22,9 +22,9 @@ blogRouter.use('/*',async (c, next)=>{
   //if not, we return the user a 403 status code
 
   const header = c.req.header("authorization") || "" // Bearer token
-  const token = header.split(" ")[1]
+//   const token = header.split(" ")[1]
 try{
-    const user = await verify(token, c.env.JWT_SECRET)
+    const user = await verify(header, c.env.JWT_SECRET)
   if(user){
     // @ts-ignore
     c.set('userId', user.id);
@@ -116,7 +116,18 @@ blogRouter.get('/bulk', async (c)=>{
         datasourceUrl: c.env.DATABASE_URL,
     }).$extends(withAccelerate())
 
-    const posts = await prisma.post.findMany();
+    const posts = await prisma.post.findMany({
+        select:{
+            content: true,
+            title: true,
+            id: true,
+            author:{
+                select:{
+                    name: true
+                }
+            }
+        }
+    });
 
     return c.json({
         posts
@@ -136,6 +147,16 @@ blogRouter.get('/:id', async (c) => {
         const post = await prisma.post.findFirst({
             where:{
                 id: id
+            },
+            select:{
+                id: true,
+                title: true,
+                content: true,
+                author: {
+                    select:{
+                        name: true
+                    }
+                }
             }
         })
 
